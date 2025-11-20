@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self';">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <title>Challenge YAML Generator</title>
+    <link rel="stylesheet" href="static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Challenge YAML Generator</h1>
+            <p>Fill out the form below to generate your challenge.yml file</p>
+        </header>
+
+        <form id="challengeForm">
+            <!-- Basic Information -->
+            <section class="form-section">
+                <h2>Basic Information</h2>
+                <div class="form-group">
+                    <label for="name">
+                        Challenge Name *
+                        <span class="info-icon" onclick="this.classList.toggle('active')" onmouseleave="this.classList.remove('active')">
+                            i
+                            <span class="tooltip">Letters, numbers, spaces, hyphens, and underscores only</span>
+                        </span>
+                    </label>
+                    <input type="text" id="name" name="name" required placeholder="Challenge Template">
+                </div>
+                <div class="form-group">
+                    <label for="category">
+                        Category *
+                        <span class="info-icon" onclick="this.classList.toggle('active')" onmouseleave="this.classList.remove('active')">
+                            i
+                            <span class="tooltip">The category prefix will be automatically added to your tag</span>
+                        </span>
+                    </label>
+                    <select id="category" name="category" required>
+                        <option value="Starters">Starters</option>
+                        <option value="Forensics">Forensics</option>
+                        <option value="Web exploitation" selected>Web exploitation</option>
+                        <option value="Cryptography">Cryptography</option>
+                        <option value="Boot 2 Root">Boot 2 Root</option>
+                        <option value="Reverse Engineering">Reverse Engineering</option>
+                        <option value="Binary (PWN)">Binary (PWN)</option>
+                        <option value="Misc">Misc</option>
+                        <option value="Operational Technologies">Operational Technologies</option>
+                    </select>
+                    <div id="tagPreview" style="margin-top: 5px; font-weight: 600;"></div>
+                </div>
+                <div class="form-group">
+                    <label for="tag">
+                        Challenge Tag (without prefix) *
+                        <span class="info-icon" onclick="this.classList.toggle('active')" onmouseleave="this.classList.remove('active')">
+                            i
+                            <span class="tooltip">Lowercase letters, numbers, hyphens, and underscores only. Prefix will be added automatically.</span>
+                        </span>
+                    </label>
+                    <input type="text" id="tag" name="tag" required placeholder="challenge-template" pattern="[a-z0-9_-]+">
+                </div>
+                <div class="form-group checkbox-group">
+                    <label>
+                        <input type="checkbox" id="static" name="static" checked>
+                        Static (enable build pipeline)
+                        <span class="info-icon" onclick="this.classList.toggle('active')" onmouseleave="this.classList.remove('active')">
+                            i
+                            <span class="tooltip">Static challenges have no running service - they only have a handout hosted elsewhere (Azure, Nextcloud, etc.). Services can be used to self-host your static/handout. When static is enabled, instances will use "dummy" image and DNS entries will be disabled.</span>
+                        </span>
+                    </label>
+                </div>
+            </section>
+
+            <!-- Challenge Description -->
+            <section class="form-section">
+                <h2>Challenge Description (OD)</h2>
+                <div class="form-group">
+                    <label for="od">
+                        Description (Markdown supported) *
+                        <span class="info-icon" onclick="this.classList.toggle('active')" onmouseleave="this.classList.remove('active')">
+                            i
+                            <span class="tooltip">Enter the challenge description in markdown format. Include prerequisites, outcomes, and solution steps.</span>
+                        </span>
+                    </label>
+                    <textarea id="od" name="od" rows="15" required placeholder="# Description of the challenge
+
+Add a detailed description of the challenge here.
+
+**Prerequisites**
+- Prerequisite 1
+- Prerequisite 2
+
+**Outcome**
+- Learning outcome 1
+- Learning outcome 2
+
+**Solution**
+Write a step-by-step solution here in markdown format."></textarea>
+                </div>
+            </section>
+
+            <!-- Services -->
+            <section class="form-section">
+                <h2>Services</h2>
+                <div id="instancesContainer">
+                    <!-- Services will be added here dynamically -->
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="addInstance()">+ Add Service</button>
+            </section>
+
+            <!-- Flags -->
+            <section class="form-section">
+                <h2>Flags</h2>
+                <div id="flagsContainer">
+                    <!-- Flags will be added here dynamically -->
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="addFlag()">+ Add Flag</button>
+            </section>
+
+            <!-- Action Buttons -->
+            <section class="form-section">
+                <div class="button-group">
+                    <button type="button" class="btn btn-primary" onclick="previewYaml()">Preview YAML</button>
+                    <button type="button" class="btn btn-success" onclick="generateYaml()">Generate & Download</button>
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset Form</button>
+                </div>
+            </section>
+        </form>
+
+        <!-- Preview Modal -->
+        <div id="previewModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closePreview()">&times;</span>
+                <h2>YAML Preview</h2>
+                <pre id="yamlPreview"></pre>
+                <button type="button" class="btn btn-success" onclick="downloadFromPreview()">Download</button>
+            </div>
+        </div>
+
+        <!-- Custom Alert Modal -->
+        <div id="customAlert" class="modal">
+            <div class="alert-content">
+                <div class="alert-icon">⚠️</div>
+                <h2 id="alertTitle">Alert</h2>
+                <p id="alertMessage"></p>
+                <button type="button" class="btn btn-primary" onclick="closeAlert()">OK</button>
+            </div>
+        </div>
+
+        <!-- Custom Confirm Modal -->
+        <div id="customConfirm" class="modal">
+            <div class="alert-content">
+                <div class="alert-icon">❓</div>
+                <h2 id="confirmTitle">Confirm</h2>
+                <p id="confirmMessage"></p>
+                <div class="button-group" style="justify-content: center; margin-top: 20px;">
+                    <button type="button" class="btn btn-primary" onclick="confirmAction(true)">Yes</button>
+                    <button type="button" class="btn btn-secondary" onclick="confirmAction(false)">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="static/script.js"></script>
+</body>
+</html>
+

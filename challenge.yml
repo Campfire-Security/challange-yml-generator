@@ -1,0 +1,46 @@
+name: Challenge Template # The overall name of the challenge
+tag: we_challenge-template # set challenge tag to be the same as the repo name for consistency. No spaces or special characters other than -
+static: true # set to true for enabling the build pipeline to build the challenge on github actions.
+secret: false # used for tagging secret challenges.
+
+od: |
+  # Description of the challenge (copy from readme.md)
+
+  Add a detailed description of the challenge here. This will be shown on the admin panel on the platform.  
+
+  **Prerequisites**  
+
+  - how to go to a website 
+
+  **Outcome**  
+  - Learn how to misconfigured ssh services can comprimise a network.
+
+  **Solution**
+  Write a step-by-step solution here in markdown format. For example:
+  ```
+    1. Connect to the vulnerable server using the provided credentials from challenge description (`ctfuser`).
+    2. From the vulnerable server, connect to the secure server using the provided credentials.
+    3. Once connected to the secure server, navigate to the home directory of the user `ctfuser`.
+    4. Locate and read the flag file to obtain the flag.
+  ```
+instance:
+  - image: ghcr.io/campfire-security/challenge-template:service1 # Should be the same as in docker-compose.yml
+    dns:
+      - name: service1.cfire # DNS entry for the service make sure to use these when connecting between services on the platform.
+        type: A
+
+  - image: ghcr.io/campfire-security/challenge-template:service2 # Should be the same as in docker-compose.yml
+    dns:
+      - name: service2.cfire # DNS entry for the service make sure to use these when connecting between services on the platform.
+        type: A
+    flags:
+      - tag: challenge-template-1 # unique tag for the flag should be main tag i.e challenge-template-<flag-number>
+        name: Challenge name # Name of the Challenge shown on the platform
+        static: "FIRE{example_flag_123456}" # for static flags the flag value goes here
+        points: 20 # points awarded for capturing the flag
+        category: Web exploitation # Category shown on the platform
+        td:
+          | # Description of the challenge goes here and is formatted in markdown.
+          Challenge description goes here and is formatted in markdown. 
+          Remember to add service dns if nmap is not needed. i.e 
+          Go to `http://service1.cfire` to find the service holding the flag.
