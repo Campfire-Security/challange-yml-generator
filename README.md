@@ -7,7 +7,7 @@ A static web application that provides an intuitive interface to generate `chall
 - **Web-based Form Interface**: Easy-to-use form with all challenge.yml fields
 - **Dynamic Instance Management**: Add multiple instances with DNS entries and flags
 - **YAML Preview**: Preview the generated YAML before downloading
-- **Client-side Processing**: All processing happens in your browser - no server required
+- **Client-side Processing**: All processing happens in your browser, no server required
 - **GitHub Pages Ready**: Automatically deployed when you push to the repository
 
 ## Usage
@@ -16,7 +16,7 @@ A static web application that provides an intuitive interface to generate `chall
 
 Simply visit the GitHub Pages URL for this repository:
 ```
-https://[your-username].github.io/challange-yml-generator/
+https://campfire-security.github.io/challange-yml-generator/
 ```
 
 ### Local Testing
@@ -102,14 +102,6 @@ The following category prefixes are automatically applied to tags:
 | Misc | `mi_` |
 | Operational Technologies | `ot_` |
 
-## GitHub Pages Setup
-
-1. Go to your repository settings
-2. Navigate to "Pages" in the left sidebar
-3. Under "Source", select the branch (usually `main` or `master`)
-4. Select the root folder (`/`)
-5. Click "Save"
-6. Your site will be available at `https://[your-username].github.io/challange-yml-generator/`
 
 ## Project Structure
 
@@ -127,10 +119,8 @@ The following category prefixes are automatically applied to tags:
 ## How It Works
 
 - All YAML generation happens client-side using the [js-yaml](https://github.com/nodeca/js-yaml) library
-- No backend server required - everything runs in your browser
+- No backend server required, everything runs in your browser
 - Form validation ensures data integrity before generation
 - Preview functionality lets you review the YAML before downloading
-
-## License
 
 This project is part of the Campfire Security challenge development tools.
